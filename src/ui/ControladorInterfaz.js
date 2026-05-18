@@ -18,6 +18,9 @@ export class ControladorInterfaz {
             this.gestorAudio.setFrecuencia(val * 100); 
             valorFrecuencia.innerText = val.toFixed(1);
             this.actualizarPanelInfo();
+            
+            // Animación GSAP al cambiar valor
+            gsap.fromTo(valorFrecuencia, { scale: 1.3 }, { scale: 1, duration: 0.2 });
         });
 
         const sliderAmplitud = document.getElementById('sliderAmplitud');
@@ -28,6 +31,8 @@ export class ControladorInterfaz {
             this.modeloOnda.setAmplitud(val);
             this.gestorAudio.setVolumen(val / 100);
             valorAmplitud.innerText = val.toString();
+            
+            gsap.fromTo(valorAmplitud, { scale: 1.3 }, { scale: 1, duration: 0.2 });
         });
 
         const checkSonido = document.getElementById('checkSonido');
@@ -44,17 +49,24 @@ export class ControladorInterfaz {
         const txtEstado = document.getElementById('txtEstado');
         
         btnPlayPause.addEventListener('click', () => {
+            const icono = btnPlayPause.querySelector('i');
+            const texto = btnPlayPause.querySelector('span');
+
             if (this.motorSimulacion.estaCorriendo) {
                 this.motorSimulacion.detener();
-                btnPlayPause.innerText = 'Reanudar';
+                texto.innerText = 'Reanudar';
+                icono.className = 'fas fa-play';
                 txtEstado.innerText = 'Pausado';
-                txtEstado.style.color = '#ef4444'; // Rojo
+                txtEstado.style.color = '#ef4444';
             } else {
                 this.motorSimulacion.iniciar();
-                btnPlayPause.innerText = 'Pausar';
+                texto.innerText = 'Pausar';
+                icono.className = 'fas fa-pause';
                 txtEstado.innerText = 'Emitiendo';
-                txtEstado.style.color = '#0ea5e9'; // Cyan
+                txtEstado.style.color = '#0ea5e9';
             }
+            
+            gsap.from(btnPlayPause, { scale: 0.95, duration: 0.1 });
         });
 
         const checkGraficas = document.getElementById('checkGraficas');
@@ -94,12 +106,17 @@ export class ControladorInterfaz {
         const txtPeriodo = document.getElementById('txtPeriodo');
         
         if (txtLongitud && txtPeriodo) {
-            // Calculamos valores reales para mostrar
             const longitud = this.modeloOnda.longitudOnda;
             const periodo = 1 / this.modeloOnda.frecuencia;
             
             txtLongitud.innerText = `${longitud.toFixed(1)} cm`;
             txtPeriodo.innerText = `${periodo.toFixed(2)} s`;
+
+            // Animación GSAP para feedback visual de actualización
+            gsap.fromTo([txtLongitud, txtPeriodo], 
+                { color: '#ffffff' }, 
+                { color: '#0ea5e9', duration: 0.5 }
+            );
         }
     }
 }

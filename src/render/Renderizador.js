@@ -16,13 +16,12 @@ export class Renderizador {
         this.capaOndas = new PIXI.Graphics();
         this.app.stage.addChild(this.capaOndas);
 
-        // --- EFECTO DE LIBRERÍA (PixiJS Filter) ---
-        // Aplicamos un filtro de desenfoque a las ondas para que se vean suaves y continuas
+        // Filtro de desenfoque para ondas suaves
         const filtroDesenfoque = new PIXI.filters.BlurFilter();
         filtroDesenfoque.blur = 5; 
         this.capaOndas.filters = [filtroDesenfoque];
 
-        // Crear un contenedor de partículas para máximo rendimiento
+        // Contenedor de partículas
         this.contenedorParticulas = new PIXI.ParticleContainer(3000, {
             position: true,
             alpha: false,
@@ -31,6 +30,10 @@ export class Renderizador {
             uvs: false,
         });
         this.app.stage.addChild(this.contenedorParticulas);
+
+        // Capa para el altavoz (Animación de bombeo)
+        this.capaAltavoz = new PIXI.Graphics();
+        this.app.stage.addChild(this.capaAltavoz);
 
         // Capa para la gráfica de presión (Al frente)
         this.capaGrafica = new PIXI.Graphics();
@@ -46,17 +49,15 @@ export class Renderizador {
     inicializarVistaParticulas(sistemaParticulas) {
         const particulas = sistemaParticulas.getParticulas();
         
-        // Crear una textura REDONDA ("Pelotitas" con volumen)
         const canvas = document.createElement('canvas');
         canvas.width = 12;
         canvas.height = 12;
         const ctx = canvas.getContext('2d');
         
-        // Gradiente radial para dar efecto de esfera 3D
         const gradiente = ctx.createRadialGradient(4, 4, 1, 6, 6, 5);
         gradiente.addColorStop(0, '#ffffff');
-        gradiente.addColorStop(0.8, '#cbd5e1'); // Slate 300
-        gradiente.addColorStop(1, '#64748b'); // Slate 500
+        gradiente.addColorStop(0.8, '#cbd5e1');
+        gradiente.addColorStop(1, '#64748b');
         
         ctx.beginPath();
         ctx.arc(6, 6, 5, 0, Math.PI * 2);
@@ -67,7 +68,7 @@ export class Renderizador {
 
         for (const p of particulas) {
             const sprite = new PIXI.Sprite(textura);
-            sprite.anchor.set(0.5); // Centrar el sprite
+            sprite.anchor.set(0.5);
             sprite.x = p.xActual;
             sprite.y = p.yActual;
             this.contenedorParticulas.addChild(sprite);
@@ -83,34 +84,58 @@ export class Renderizador {
             this.contenedorParticulas.visible = true;
             for (let i = 0; i < particulas.length; i++) {
                 this.spritesParticulas[i].x = particulas[i].xActual;
+                this.spritesParticulas[i].y = particulas[i].yActual; // AHORA TAMBIÉN ACTUALIZA Y
             }
         } else {
             this.contenedorParticulas.visible = false;
         }
 
-        // 2. Renderizar Ondas REDONDEADAS (Círculos concéntricos)
+        // 2. Renderizar Ondas Concéntricas
         this.capaOndas.clear();
         if (this.mostrarOndas) {
-            const xCentro = 0; // Origen de la onda (Altavoz a la izquierda)
-            const yCentro = 200; // Centro vertical
-            const resolucion = 8; // Espaciado entre anillos
+            const xCentro = 0;
+            const yCentro = 200;
+            const resolucion = 8;
             
-            // Dibujamos círculos concéntricos desde el origen
             for (let r = 0; r < 900; r += resolucion) {
-                // Usamos el radio como la distancia 'x' en la fórmula de la onda
                 const presion = modeloOnda.getPresionEn(r); 
-                
                 const factor = (presion + modeloOnda.amplitud) / (modeloOnda.amplitud * 2);
                 const valorGris = Math.floor(factor * 255);
                 const color = (valorGris << 16) | (valorGris << 8) | valorGris;
                 
-                // Dibujar el anillo
                 this.capaOndas.lineStyle(resolucion, color, 0.6);
                 this.capaOndas.drawCircle(xCentro, yCentro, r);
             }
         }
 
-        // 3. Renderizar Gráfica de Presión
+        // 3. Renderizar Altavoz (ANIMACIÓN DE BOMBEO)
+        this.capaAltavoz.clear();
+        const xBase = 0;
+        const yBase = 200;
+        
+        // El cono se mueve al ritmo de la onda
+        const oscilacion = Math.cos(modeloOnda.omega * modeloOnda.tiempo);
+        const desplazamientoCono = oscilacion * (modeloOnda.amplitud / 5);
+        
+        // Dibujar imán/caja del altavoz
+        this.capaAltavoz.beginFill(0x1e293b);
+        this.capaAltavoz.drawRect(xBase, yBase - 40, 30, 80);
+        this.capaAltavoz.endFill();
+
+        // Dibujar cono del altavoz (se estira y encoge)
+        this.capaAltavoz.beginFill(0x475569);
+        this.capaAltavoz.moveTo(30, yBase - 40);
+        this.capaAltavoz.lineTo(70 + desplazamientoCono, yBase - 70);
+        this.capaAltavoz.lineTo(70 + desplazamientoCono, yBase + 70);
+        this.capaAltavoz.lineTo(30, yBase + 40);
+        this.capaAltavoz.endFill();
+
+        // Centro del cono
+        this.capaAltavoz.beginFill(0x0ea5e9);
+        this.capaAltavoz.drawEllipse(70 + desplazamientoCono, yBase, 5, 20);
+        this.capaAltavoz.endFill();
+
+        // 4. Renderizar Gráfica de Presión
         this.capaGrafica.clear();
         if (this.mostrarGrafica) {
             const xInicio = 100;
@@ -131,7 +156,6 @@ export class Renderizador {
             
             let primerPunto = true;
             for (let x = xInicio; x < xInicio + anchoGrafica; x++) {
-                // Para la gráfica usamos la presión en el eje X horizontal
                 const presion = modeloOnda.getPresionEn(x);
                 const y = yCentro - (presion / modeloOnda.amplitud) * 40; 
                 

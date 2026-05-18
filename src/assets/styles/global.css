@@ -58,6 +58,15 @@ header h1 {
     margin-top: 0.25rem;
 }
 
+.academic-credit {
+    color: #38bdf8; /* Cyan claro para destacar la universidad */
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-top: 0.25rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
 .main-content {
     display: grid;
     grid-template-columns: 3fr 1fr;
@@ -85,7 +94,7 @@ header h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    position: relative; /* Para posicionar elementos absolutos dentro */
+    position: relative;
 }
 
 canvas {
@@ -257,8 +266,6 @@ input[type="range"] {
     background-color: var(--danger-color);
     color: white;
 }
-
-/* --- NUEVOS ESTILOS PARA ENRIQUECER LA INTERFAZ --- */
 
 .info-panel {
     display: flex;

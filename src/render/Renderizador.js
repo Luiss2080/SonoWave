@@ -39,7 +39,7 @@ export class Renderizador {
         this.capaGrafica = new PIXI.Graphics();
         this.app.stage.addChild(this.capaGrafica);
 
-        // Contenedor para textos (coordenadas) - Pixi ParticleContainer no admite texto
+        // Contenedor para textos (coordenadas)
         this.contenedorTextos = new PIXI.Container();
         this.app.stage.addChild(this.contenedorTextos);
 
@@ -53,7 +53,6 @@ export class Renderizador {
     inicializarVistaParticulas(sistemaParticulas) {
         const particulas = sistemaParticulas.getParticulas();
         
-        // Textura Blanca (Normal)
         const canvasBlanco = document.createElement('canvas');
         canvasBlanco.width = 12;
         canvasBlanco.height = 12;
@@ -68,15 +67,14 @@ export class Renderizador {
         ctxB.fill();
         const texturaBlanca = PIXI.Texture.from(canvasBlanco);
 
-        // Textura Roja (Seguimiento)
         const canvasRojo = document.createElement('canvas');
         canvasRojo.width = 12;
         canvasRojo.height = 12;
         const ctxR = canvasRojo.getContext('2d');
         const gradienteR = ctxR.createRadialGradient(4, 4, 1, 6, 6, 5);
-        gradienteR.addColorStop(0, '#ff8787'); // Rojo claro
-        gradienteR.addColorStop(0.8, '#ef4444'); // Rojo medio
-        gradienteR.addColorStop(1, '#b91c1c'); // Rojo oscuro
+        gradienteR.addColorStop(0, '#ff8787');
+        gradienteR.addColorStop(0.8, '#ef4444');
+        gradienteR.addColorStop(1, '#b91c1c');
         ctxR.beginPath();
         ctxR.arc(6, 6, 5, 0, Math.PI * 2);
         ctxR.fillStyle = gradienteR;
@@ -114,10 +112,17 @@ export class Renderizador {
             const yCentro = 200;
             const resolucion = 8;
             
+            // NUEVO: Usamos una constante de amplitud máxima para que el contraste varíe
+            const amplitudMaxima = 100; 
+            
             for (let r = 0; r < 900; r += resolucion) {
                 const presion = modeloOnda.getPresionEn(r); 
-                const factor = (presion + modeloOnda.amplitud) / (modeloOnda.amplitud * 2);
-                const valorGris = Math.floor(factor * 255);
+                
+                // Si la presión es 0, el factor es 0.5 (gris neutro)
+                // Si la presión es max (100), el factor es 1.0 (blanco)
+                // Si la presión es min (-100), el factor es 0.0 (negro)
+                const factor = (presion + amplitudMaxima) / (amplitudMaxima * 2);
+                const valorGris = Math.floor(Math.min(Math.max(factor, 0), 1) * 255);
                 const color = (valorGris << 16) | (valorGris << 8) | valorGris;
                 
                 this.capaOndas.lineStyle(resolucion, color, 0.6);
@@ -129,8 +134,11 @@ export class Renderizador {
         this.capaAltavoz.clear();
         const xBase = 0;
         const yBase = 200;
-        const oscilacion = Math.cos(modeloOnda.omega * modeloOnda.tiempo);
-        const desplazamientoCono = oscilacion * (modeloOnda.amplitud / 5);
+        
+        // Obtenemos el desplazamiento directamente de la presión en el origen (x=0)
+        // Esto asegura que el altavoz se mueva sincronizado con la onda que emite
+        const oscilacion = modeloOnda.getPresionEn(0) / 100; // Normalizado
+        const desplazamientoCono = oscilacion * 20; 
         
         this.capaAltavoz.beginFill(0x1e293b);
         this.capaAltavoz.drawRect(xBase, yBase - 40, 30, 80);
@@ -147,9 +155,9 @@ export class Renderizador {
         this.capaAltavoz.drawEllipse(70 + desplazamientoCono, yBase, 5, 20);
         this.capaAltavoz.endFill();
 
-        // 4. Renderizar Gráfica de Presión y COORDENADAS
+        // 4. Renderizar Gráfica de Presión y Coordenadas
         this.capaGrafica.clear();
-        this.contenedorTextos.removeChildren(); // Limpiar textos del frame anterior
+        this.contenedorTextos.removeChildren(); 
         
         if (this.mostrarGrafica) {
             const xInicio = 100;
@@ -171,7 +179,8 @@ export class Renderizador {
             let primerPunto = true;
             for (let x = xInicio; x < xInicio + anchoGrafica; x++) {
                 const presion = modeloOnda.getPresionEn(x);
-                const y = yCentro - (presion / modeloOnda.amplitud) * 40; 
+                // Usamos la amplitud máxima para escalar la gráfica también
+                const y = yCentro - (presion / 100) * 40; 
                 
                 if (primerPunto) {
                     this.capaGrafica.moveTo(x, y);
@@ -181,7 +190,6 @@ export class Renderizador {
                 }
             }
 
-            // DIBUJAR COORDENADAS Y MARCAS
             const estiloTexto = new PIXI.TextStyle({
                 fontFamily: 'Outfit',
                 fontSize: 10,
@@ -189,13 +197,11 @@ export class Renderizador {
             });
 
             for (let x = xInicio; x <= xInicio + anchoGrafica; x += 100) {
-                // Marca en el eje
                 this.capaGrafica.lineStyle(1, 0x475569, 1);
                 this.capaGrafica.moveTo(x, yCentro - 5);
                 this.capaGrafica.lineTo(x, yCentro + 5);
                 
-                // Texto de la coordenada
-                const valorSimulado = (x - xInicio) / 1.2; // Escala para simular cm
+                const valorSimulado = (x - xInicio) / 1.2; 
                 const texto = new PIXI.Text(Math.round(valorSimulado).toString(), estiloTexto);
                 texto.anchor.set(0.5, 0);
                 texto.x = x;
@@ -203,7 +209,6 @@ export class Renderizador {
                 this.contenedorTextos.addChild(texto);
             }
 
-            // Etiqueta del eje X
             const textoEje = new PIXI.Text('Posición (cm)', estiloTexto);
             textoEje.anchor.set(0.5, 0);
             textoEje.x = xInicio + anchoGrafica / 2;

@@ -8,10 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/src/assets/styles/global.css">
-    
-    <!-- FontAwesome para iconos profesionales -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.2/pixi.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
@@ -53,22 +50,6 @@
                         <label><input type="radio" name="velocidad" value="lento"> Lento</label>
                     </div>
                 </div>
-
-                <!-- Panel: Información en tiempo real -->
-                <div class="info-panel card-style" title="Datos físicos calculados en tiempo real">
-                    <div class="info-item">
-                        <span class="info-label">Estado:</span>
-                        <span id="txtEstado" class="info-value">Emitiendo</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Longitud de Onda:</span>
-                        <span id="txtLongitud" class="info-value">-- m</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Periodo:</span>
-                        <span id="txtPeriodo" class="info-value">-- s</span>
-                    </div>
-                </div>
             </div>
             
             <!-- Panel de Controles -->
@@ -76,7 +57,7 @@
                 <!-- Parámetros -->
                 <div class="control-card">
                     <h3><i class="fas fa-sliders"></i> Parámetros</h3>
-                    <div class="control-group" title="Modifica la frecuencia de la onda (tonos graves a agudos)">
+                    <div class="control-group" title="Modifica la frecuencia de la onda">
                         <div class="label-row">
                             <label for="sliderFrecuencia">Frecuencia</label>
                             <span class="value-display"><span id="valorFrecuencia">2.0</span> Hz</span>
@@ -89,7 +70,8 @@
                             <label for="sliderAmplitud">Amplitud</label>
                             <span class="value-display"><span id="valorAmplitud">50</span>%</span>
                         </div>
-                        <input type="range" id="sliderAmplitud" min="10" max="100" step="5" value="50">
+                        <!-- Amplitud mínima ahora es 0 para permitir apagar el bombeo -->
+                        <input type="range" id="sliderAmplitud" min="0" max="100" step="5" value="50">
                     </div>
                 </div>
 
@@ -97,8 +79,8 @@
                 <div class="control-card">
                     <h3><i class="fas fa-eye"></i> Visualización</h3>
                     <div class="checkbox-group">
-                        <label title="Muestra u oculta la gráfica de presión inferior"><input type="checkbox" id="checkGraficas" checked> Mostrar Gráficas</label>
-                        <label title="Activa el sonido real en tus altavoces"><input type="checkbox" id="checkSonido" checked> Reproducir Tono</label>
+                        <label title="Muestra u oculta la gráfica de presión"><input type="checkbox" id="checkGraficas" checked> Mostrar Gráficas</label>
+                        <label title="Activa el sonido real"><input type="checkbox" id="checkSonido" checked> Reproducir Tono</label>
                     </div>
                     
                     <div class="divider"></div>
@@ -107,27 +89,6 @@
                         <label><input type="radio" name="modoVista" value="ondas"> Solo Ondas</label>
                         <label><input type="radio" name="modoVista" value="particulas"> Solo Partículas</label>
                         <label><input type="radio" name="modoVista" value="ambos" checked> Ambos Modos</label>
-                    </div>
-                </div>
-
-                <!-- Panel de Leyenda -->
-                <div class="control-card legend-card">
-                    <h3><i class="fas fa-info-circle"></i> Leyenda</h3>
-                    <div class="legend-item" title="Zonas donde las moléculas están comprimidas">
-                        <div class="color-box compresión"></div>
-                        <span>Compresión (Alta Presión)</span>
-                    </div>
-                    <div class="legend-item" title="Zonas donde las moléculas están separadas">
-                        <div class="color-box rarefaccion"></div>
-                        <span>Rarefacción (Baja Presión)</span>
-                    </div>
-                    <div class="legend-item" title="Representación de una molécula de aire">
-                        <div class="dot-box normal"></div>
-                        <span>Molécula de Aire</span>
-                    </div>
-                    <div class="legend-item" title="Partícula destacada para ver su movimiento radial">
-                        <div class="dot-box roja"></div>
-                        <span>Partícula de Seguimiento</span>
                     </div>
                 </div>
 

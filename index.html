@@ -8,13 +8,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/src/assets/styles/global.css">
+    
+    <!-- NUEVO: FontAwesome para iconos profesionales -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.2/pixi.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 <body>
     <div id="app">
         <header>
-            <h1>Simulador de Ondas Sonoras</h1>
+            <h1><i class="fas fa-wave-square"></i> Simulador de Ondas Sonoras</h1>
             <p class="subtitle">Laboratorio Virtual de Acústica y Propagación</p>
             <p class="academic-credit">Universidad Privada Domingo Savio</p>
         </header>
@@ -22,33 +26,36 @@
         <div class="main-content">
             <!-- Área de Simulación -->
             <div class="simulation-area">
-                <div class="canvas-container" id="contenedorCanvas">
-                    <!-- PixiJS creará el canvas aquí -->
-                    <div id="marcadorCentro">Presión en el Centro</div>
+                <div class="canvas-container" id="contenedorCanvas" title="Área de propagación de la onda sonora">
+                    <div id="marcadorCentro"><i class="fas fa-crosshairs"></i> Presión en el Centro</div>
                 </div>
                 
                 <!-- Controles de reproducción inferiores -->
                 <div class="playback-controls card-style">
                     <div class="btn-group">
-                        <button id="btnPlayPause" class="action-btn">Pausar</button>
-                        <button id="btnPaso" class="action-btn secondary">Paso a Paso</button>
+                        <button id="btnPlayPause" class="action-btn" title="Pausar o reanudar la simulación">
+                            <i class="fas fa-pause"></i> <span>Pausar</span>
+                        </button>
+                        <button id="btnPaso" class="action-btn secondary" title="Avanzar paso a paso">
+                            <i class="fas fa-forward-step"></i> Paso
+                        </button>
                     </div>
                     
-                    <div class="radio-group horizontal">
-                        <span>Emisión:</span>
+                    <div class="radio-group horizontal" title="Cambia el tipo de emisión">
+                        <span><i class="fas fa-broadcast-tower"></i> Emisión:</span>
                         <label><input type="radio" name="modoEmision" value="continuo" checked> Continuo</label>
                         <label><input type="radio" name="modoEmision" value="pulso"> Pulso</label>
                     </div>
 
-                    <div class="radio-group horizontal">
-                        <span>Velocidad:</span>
+                    <div class="radio-group horizontal" title="Velocidad del tiempo en la simulación">
+                        <span><i class="fas fa-clock"></i> Tiempo:</span>
                         <label><input type="radio" name="velocidad" value="normal" checked> Normal</label>
                         <label><input type="radio" name="velocidad" value="lento"> Lento</label>
                     </div>
                 </div>
 
                 <!-- Panel: Información en tiempo real -->
-                <div class="info-panel card-style">
+                <div class="info-panel card-style" title="Datos físicos calculados en tiempo real">
                     <div class="info-item">
                         <span class="info-label">Estado:</span>
                         <span id="txtEstado" class="info-value">Emitiendo</span>
@@ -68,8 +75,8 @@
             <aside class="sidebar-controls">
                 <!-- Parámetros -->
                 <div class="control-card">
-                    <h3>Parámetros</h3>
-                    <div class="control-group">
+                    <h3><i class="fas fa-sliders"></i> Parámetros</h3>
+                    <div class="control-group" title="Modifica la frecuencia de la onda (tonos graves a agudos)">
                         <div class="label-row">
                             <label for="sliderFrecuencia">Frecuencia</label>
                             <span class="value-display"><span id="valorFrecuencia">2.0</span> Hz</span>
@@ -77,7 +84,7 @@
                         <input type="range" id="sliderFrecuencia" min="1" max="5" step="0.1" value="2">
                     </div>
 
-                    <div class="control-group">
+                    <div class="control-group" title="Modifica la amplitud o intensidad de la onda">
                         <div class="label-row">
                             <label for="sliderAmplitud">Amplitud</label>
                             <span class="value-display"><span id="valorAmplitud">50</span>%</span>
@@ -88,15 +95,15 @@
 
                 <!-- Visualización -->
                 <div class="control-card">
-                    <h3>Visualización</h3>
+                    <h3><i class="fas fa-eye"></i> Visualización</h3>
                     <div class="checkbox-group">
-                        <label><input type="checkbox" id="checkGraficas" checked> Mostrar Gráficas</label>
-                        <label><input type="checkbox" id="checkSonido" checked> Reproducir Tono</label>
+                        <label title="Muestra u oculta la gráfica de presión inferior"><input type="checkbox" id="checkGraficas" checked> Mostrar Gráficas</label>
+                        <label title="Activa el sonido real en tus altavoces"><input type="checkbox" id="checkSonido" checked> Reproducir Tono</label>
                     </div>
                     
                     <div class="divider"></div>
                     
-                    <div class="radio-group vertical">
+                    <div class="radio-group vertical" title="Elige qué elementos visuales renderizar">
                         <label><input type="radio" name="modoVista" value="ondas"> Solo Ondas</label>
                         <label><input type="radio" name="modoVista" value="particulas"> Solo Partículas</label>
                         <label><input type="radio" name="modoVista" value="ambos" checked> Ambos Modos</label>
@@ -105,22 +112,28 @@
 
                 <!-- Panel de Leyenda -->
                 <div class="control-card legend-card">
-                    <h3>Leyenda</h3>
-                    <div class="legend-item">
+                    <h3><i class="fas fa-info-circle"></i> Leyenda</h3>
+                    <div class="legend-item" title="Zonas donde las moléculas están comprimidas">
                         <div class="color-box compresión"></div>
-                        <span>Zona de Compresión (Alta Presión)</span>
+                        <span>Compresión (Alta Presión)</span>
                     </div>
-                    <div class="legend-item">
+                    <div class="legend-item" title="Zonas donde las moléculas están separadas">
                         <div class="color-box rarefaccion"></div>
-                        <span>Zona de Rarefacción (Baja Presión)</span>
+                        <span>Rarefacción (Baja Presión)</span>
                     </div>
-                    <div class="legend-item">
-                        <div class="dot-box"></div>
+                    <div class="legend-item" title="Representación de una molécula de aire">
+                        <div class="dot-box normal"></div>
                         <span>Molécula de Aire</span>
+                    </div>
+                    <div class="legend-item" title="Partícula destacada para ver su movimiento radial">
+                        <div class="dot-box roja"></div>
+                        <span>Partícula de Seguimiento</span>
                     </div>
                 </div>
 
-                <button id="btnReiniciar" class="danger-btn">Reiniciar Simulación</button>
+                <button id="btnReiniciar" class="danger-btn" title="Vuelve a los valores por defecto">
+                    <i class="fas fa-undo"></i> Reiniciar Simulación
+                </button>
             </aside>
         </div>
     </div>

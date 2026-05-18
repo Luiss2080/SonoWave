@@ -2,19 +2,48 @@ export class ModeloOnda {
     constructor() {
         this.amplitud = 50; // En unidades visuales
         this.frecuencia = 2; // En Hz
-        this.velocidad = 343; // Velocidad del sonido m/s
+        this.velocidad = 200; // Velocidad visual en pixeles/segundo (ajustada para que coincida con el delay)
         this.tiempo = 0;
         this.modo = 'continuo'; // 'continuo' o 'pulso'
         this.tiempoInicioPulso = 0;
+        
+        // BUFFER DE EMISIONES: Para que los cambios se propaguen progresivamente
+        this.historialEmisiones = [];
     }
 
     actualizar(tiempoDelta, factorVelocidad = 1) {
         this.tiempo += tiempoDelta * factorVelocidad;
         
-        // Evitar que el tiempo crezca infinitamente en modo continuo
-        const periodo = 1 / this.frecuencia;
-        if (this.tiempo > periodo * 100) {
-            this.tiempo = this.tiempo % periodo;
+        // Emitir el valor actual del altavoz
+        let presionEmitida = 0;
+        let desplazamientoEmitido = 0;
+        const omega = 2 * Math.PI * this.frecuencia;
+
+        if (this.modo === 'continuo') {
+            presionEmitida = this.amplitud * Math.sin(omega * this.tiempo);
+            desplazamientoEmitido = this.amplitud * Math.cos(omega * this.tiempo);
+        } else {
+            // Modo pulso: Un paquete de onda gaussiano
+            const tRelativo = this.tiempo - this.tiempoInicioPulso;
+            const anchoPulso = 0.2; // Duración del pulso en segundos
+            const factor = Math.exp(-Math.pow(tRelativo / anchoPulso, 2));
+            presionEmitida = this.amplitud * factor;
+            desplazamientoEmitido = this.amplitud * factor;
+        }
+
+        // Guardar en el buffer
+        this.historialEmisiones.push({
+            tiempo: this.tiempo,
+            presion: presionEmitida,
+            desplazamiento: desplazamientoEmitido
+        });
+
+        // Limpiar historial viejo para no saturar la memoria
+        // El canvas mide 800px. A 200px/s, la onda tarda 4 segundos en cruzar.
+        // Guardamos 5 segundos de historial.
+        const tiempoLimite = this.tiempo - 5;
+        while (this.historialEmisiones.length > 0 && this.historialEmisiones[0].tiempo < tiempoLimite) {
+            this.historialEmisiones.shift();
         }
     }
 
@@ -37,40 +66,45 @@ export class ModeloOnda {
         return 2 * Math.PI * this.frecuencia;
     }
 
-    get longitudOnda() {
-        return this.velocidad / this.frecuencia;
-    }
-
-    get k() {
-        return (2 * Math.PI) / this.longitudOnda;
-    }
-
-    // Ecuación de Presión
+    // Obtener la presión que se emitió en el pasado y que ahora llega a la distancia x
     getPresionEn(x) {
-        if (this.modo === 'continuo') {
-            return this.amplitud * Math.sin(this.k * x - this.omega * this.tiempo);
-        } else {
-            // MODO PULSO: Pulso gaussiano que se desplaza
-            const tRelativo = this.tiempo - this.tiempoInicioPulso;
-            // Simulamos la posición del centro del pulso
-            const xCentro = tRelativo * 200; // Velocidad visual en pixeles/segundo
-            const anchoPulso = 40; // Qué tan ancho es el pulso
-            
-            return this.amplitud * Math.exp(-Math.pow(x - xCentro, 2) / Math.pow(anchoPulso, 2));
-        }
+        const tiempoRetraso = x / this.velocidad;
+        const tiempoObjetivo = this.tiempo - tiempoRetraso;
+        
+        return this.obtenerValorHistorial(tiempoObjetivo, 'presion');
     }
 
-    // Desplazamiento longitudinal de partículas
     getDesplazamientoEn(x) {
-        if (this.modo === 'continuo') {
-            return this.amplitud * Math.cos(this.k * x - this.omega * this.tiempo);
-        } else {
-            // En el pulso, las partículas se mueven en la dirección de la onda y luego regresan
-            const tRelativo = this.tiempo - this.tiempoInicioPulso;
-            const xCentro = tRelativo * 200;
-            const anchoPulso = 40;
+        const tiempoRetraso = x / this.velocidad;
+        const tiempoObjetivo = this.tiempo - tiempoRetraso;
+        
+        return this.obtenerValorHistorial(tiempoObjetivo, 'desplazamiento');
+    }
+
+    obtenerValorHistorial(tiempoObjetivo, propiedad) {
+        if (this.historialEmisiones.length === 0) return 0;
+
+        // Búsqueda binaria para encontrar el frame más cercano al tiempo objetivo
+        let min = 0;
+        let max = this.historialEmisiones.length - 1;
+        
+        while (min <= max) {
+            let mid = Math.floor((min + max) / 2);
+            let t = this.historialEmisiones[mid].tiempo;
             
-            return this.amplitud * Math.exp(-Math.pow(x - xCentro, 2) / Math.pow(anchoPulso, 2));
+            if (Math.abs(t - tiempoObjetivo) < 0.01) {
+                return this.historialEmisiones[mid][propiedad];
+            }
+            
+            if (t < tiempoObjetivo) {
+                min = mid + 1;
+            } else {
+                max = mid - 1;
+            }
         }
+        
+        // Si no encuentra el exacto, devuelve el más cercano
+        const index = Math.min(Math.max(min, 0), this.historialEmisiones.length - 1);
+        return this.historialEmisiones[index][propiedad];
     }
 }

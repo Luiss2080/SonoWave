@@ -39,6 +39,10 @@ export class Renderizador {
         this.capaGrafica = new PIXI.Graphics();
         this.app.stage.addChild(this.capaGrafica);
 
+        // Contenedor para textos (coordenadas) - Pixi ParticleContainer no admite texto
+        this.contenedorTextos = new PIXI.Container();
+        this.app.stage.addChild(this.contenedorTextos);
+
         this.spritesParticulas = [];
         
         this.mostrarOndas = true;
@@ -49,25 +53,38 @@ export class Renderizador {
     inicializarVistaParticulas(sistemaParticulas) {
         const particulas = sistemaParticulas.getParticulas();
         
-        const canvas = document.createElement('canvas');
-        canvas.width = 12;
-        canvas.height = 12;
-        const ctx = canvas.getContext('2d');
-        
-        const gradiente = ctx.createRadialGradient(4, 4, 1, 6, 6, 5);
-        gradiente.addColorStop(0, '#ffffff');
-        gradiente.addColorStop(0.8, '#cbd5e1');
-        gradiente.addColorStop(1, '#64748b');
-        
-        ctx.beginPath();
-        ctx.arc(6, 6, 5, 0, Math.PI * 2);
-        ctx.fillStyle = gradiente;
-        ctx.fill();
-        
-        const textura = PIXI.Texture.from(canvas);
+        // Textura Blanca (Normal)
+        const canvasBlanco = document.createElement('canvas');
+        canvasBlanco.width = 12;
+        canvasBlanco.height = 12;
+        const ctxB = canvasBlanco.getContext('2d');
+        const gradienteB = ctxB.createRadialGradient(4, 4, 1, 6, 6, 5);
+        gradienteB.addColorStop(0, '#ffffff');
+        gradienteB.addColorStop(0.8, '#cbd5e1');
+        gradienteB.addColorStop(1, '#64748b');
+        ctxB.beginPath();
+        ctxB.arc(6, 6, 5, 0, Math.PI * 2);
+        ctxB.fillStyle = gradienteB;
+        ctxB.fill();
+        const texturaBlanca = PIXI.Texture.from(canvasBlanco);
+
+        // Textura Roja (Seguimiento)
+        const canvasRojo = document.createElement('canvas');
+        canvasRojo.width = 12;
+        canvasRojo.height = 12;
+        const ctxR = canvasRojo.getContext('2d');
+        const gradienteR = ctxR.createRadialGradient(4, 4, 1, 6, 6, 5);
+        gradienteR.addColorStop(0, '#ff8787'); // Rojo claro
+        gradienteR.addColorStop(0.8, '#ef4444'); // Rojo medio
+        gradienteR.addColorStop(1, '#b91c1c'); // Rojo oscuro
+        ctxR.beginPath();
+        ctxR.arc(6, 6, 5, 0, Math.PI * 2);
+        ctxR.fillStyle = gradienteR;
+        ctxR.fill();
+        const texturaRoja = PIXI.Texture.from(canvasRojo);
 
         for (const p of particulas) {
-            const sprite = new PIXI.Sprite(textura);
+            const sprite = new PIXI.Sprite(p.esRoja ? texturaRoja : texturaBlanca);
             sprite.anchor.set(0.5);
             sprite.x = p.xActual;
             sprite.y = p.yActual;
@@ -84,7 +101,7 @@ export class Renderizador {
             this.contenedorParticulas.visible = true;
             for (let i = 0; i < particulas.length; i++) {
                 this.spritesParticulas[i].x = particulas[i].xActual;
-                this.spritesParticulas[i].y = particulas[i].yActual; // AHORA TAMBIÉN ACTUALIZA Y
+                this.spritesParticulas[i].y = particulas[i].yActual;
             }
         } else {
             this.contenedorParticulas.visible = false;
@@ -108,21 +125,17 @@ export class Renderizador {
             }
         }
 
-        // 3. Renderizar Altavoz (ANIMACIÓN DE BOMBEO)
+        // 3. Renderizar Altavoz (Animación)
         this.capaAltavoz.clear();
         const xBase = 0;
         const yBase = 200;
-        
-        // El cono se mueve al ritmo de la onda
         const oscilacion = Math.cos(modeloOnda.omega * modeloOnda.tiempo);
         const desplazamientoCono = oscilacion * (modeloOnda.amplitud / 5);
         
-        // Dibujar imán/caja del altavoz
         this.capaAltavoz.beginFill(0x1e293b);
         this.capaAltavoz.drawRect(xBase, yBase - 40, 30, 80);
         this.capaAltavoz.endFill();
 
-        // Dibujar cono del altavoz (se estira y encoge)
         this.capaAltavoz.beginFill(0x475569);
         this.capaAltavoz.moveTo(30, yBase - 40);
         this.capaAltavoz.lineTo(70 + desplazamientoCono, yBase - 70);
@@ -130,13 +143,14 @@ export class Renderizador {
         this.capaAltavoz.lineTo(30, yBase + 40);
         this.capaAltavoz.endFill();
 
-        // Centro del cono
         this.capaAltavoz.beginFill(0x0ea5e9);
         this.capaAltavoz.drawEllipse(70 + desplazamientoCono, yBase, 5, 20);
         this.capaAltavoz.endFill();
 
-        // 4. Renderizar Gráfica de Presión
+        // 4. Renderizar Gráfica de Presión y COORDENADAS
         this.capaGrafica.clear();
+        this.contenedorTextos.removeChildren(); // Limpiar textos del frame anterior
+        
         if (this.mostrarGrafica) {
             const xInicio = 100;
             const yCentro = 300;
@@ -166,6 +180,35 @@ export class Renderizador {
                     this.capaGrafica.lineTo(x, y);
                 }
             }
+
+            // DIBUJAR COORDENADAS Y MARCAS
+            const estiloTexto = new PIXI.TextStyle({
+                fontFamily: 'Outfit',
+                fontSize: 10,
+                fill: '#94a3b8',
+            });
+
+            for (let x = xInicio; x <= xInicio + anchoGrafica; x += 100) {
+                // Marca en el eje
+                this.capaGrafica.lineStyle(1, 0x475569, 1);
+                this.capaGrafica.moveTo(x, yCentro - 5);
+                this.capaGrafica.lineTo(x, yCentro + 5);
+                
+                // Texto de la coordenada
+                const valorSimulado = (x - xInicio) / 1.2; // Escala para simular cm
+                const texto = new PIXI.Text(Math.round(valorSimulado).toString(), estiloTexto);
+                texto.anchor.set(0.5, 0);
+                texto.x = x;
+                texto.y = yCentro + 8;
+                this.contenedorTextos.addChild(texto);
+            }
+
+            // Etiqueta del eje X
+            const textoEje = new PIXI.Text('Posición (cm)', estiloTexto);
+            textoEje.anchor.set(0.5, 0);
+            textoEje.x = xInicio + anchoGrafica / 2;
+            textoEje.y = yCentro + 25;
+            this.contenedorTextos.addChild(textoEje);
         }
     }
 

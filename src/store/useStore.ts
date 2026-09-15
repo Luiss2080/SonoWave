@@ -4,6 +4,7 @@ interface SimulationState {
   frequency: number;
   amplitude: number;
   mode: 'continuo' | 'pulso';
+  waveShape: 'sine' | 'square' | 'triangle';
   timeScale: 'normal' | 'lento';
   viewMode: 'ondas' | 'particulas' | 'ambos';
   soundEnabled: boolean;
@@ -15,6 +16,9 @@ interface SimulationState {
   setViewMode: (vm: 'ondas' | 'particulas' | 'ambos') => void;
   setSoundEnabled: (s: boolean) => void;
   setMetricsVisible: (m: boolean) => void;
+  isHelpModalOpen: boolean;
+  setHelpModalOpen: (isOpen: boolean) => void;
+  setWaveShape: (shape: 'sine' | 'square' | 'triangle') => void;
   reset: () => void;
 }
 
@@ -22,10 +26,12 @@ const initialState = {
   frequency: 2.0,
   amplitude: 50,
   mode: 'continuo' as const,
+  waveShape: 'sine' as const,
   timeScale: 'normal' as const,
   viewMode: 'ambos' as const,
   soundEnabled: true,
   metricsVisible: true,
+  isHelpModalOpen: true, // Abrir onboarding por defecto
 };
 
 export const useStore = create<SimulationState>((set) => ({
@@ -37,5 +43,7 @@ export const useStore = create<SimulationState>((set) => ({
   setViewMode: (vm) => set({ viewMode: vm }),
   setSoundEnabled: (s) => set({ soundEnabled: s }),
   setMetricsVisible: (m) => set({ metricsVisible: m }),
+  setHelpModalOpen: (isOpen) => set({ isHelpModalOpen: isOpen }),
+  setWaveShape: (shape) => set({ waveShape: shape }),
   reset: () => set(initialState),
 }));

@@ -18,23 +18,31 @@ export function useSimulationEngine(canvasRef: React.RefObject<HTMLDivElement>) 
   useEffect(() => {
     if (!canvasRef.current) return;
 
-    const app = new PIXI.Application({
-      width: 800,
-      height: 400,
-      backgroundColor: 0x030712,
-      resolution: window.devicePixelRatio || 1,
-      autoDensity: true,
-      preserveDrawingBuffer: true,
-    });
+    const initPixi = async () => {
+      const app = new PIXI.Application();
+      await app.init({
+        width: 800,
+        height: 400,
+        backgroundColor: 0x030712,
+        resolution: window.devicePixelRatio || 1,
+        autoDensity: true,
+        preserveDrawingBuffer: true,
+      });
 
-    canvasRef.current.appendChild(app.view as any);
-    appRef.current = app;
+      if (canvasRef.current) {
+        // Compatibilidad con PixiJS v7 y v8
+        const canvasElement = (app as any).canvas || (app as any).view;
+        canvasRef.current.appendChild(canvasElement);
+        appRef.current = app;
+      }
+    };
 
-    // Aquí iría el setup de las capas del renderizador que extraemos del Renderizador.js original...
-    // Por simplicidad, dejaremos que SimulationCanvas se encargue de dibujar en el app.ticker o lo montaremos aquí.
-    
+    initPixi();
+
     return () => {
-      app.destroy(true, { children: true });
+      if (appRef.current) {
+        appRef.current.destroy(true, { children: true });
+      }
       gestorAudioRef.current.detenerTono();
     };
   }, [canvasRef]);

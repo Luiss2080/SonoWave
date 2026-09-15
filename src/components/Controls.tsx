@@ -189,6 +189,25 @@ export const Controls: React.FC = () => {
 
       {/* Toggles Rápidos */}
       <div className="flex flex-col gap-3 mt-auto">
+        <div className="flex gap-2">
+          <Tooltip content="Configuración Avanzada">
+            <button 
+              onClick={() => store.setSettingsOpen(true)}
+              className="p-2 bg-gray-800 text-gray-400 hover:text-white rounded-lg transition-colors"
+            >
+              <Settings2 size={18} />
+            </button>
+          </Tooltip>
+          <Tooltip content="Métricas">
+            <button 
+              onClick={() => store.setMetricsVisible(!store.metricsVisible)}
+              className={`p-2 rounded-lg transition-colors ${store.metricsVisible ? 'bg-blue-600/20 text-blue-400' : 'bg-gray-800 text-gray-400 hover:text-white'}`}
+            >
+              <Eye size={18} />
+            </button>
+          </Tooltip>
+        </div>
+
         <button 
           className={`flex items-center justify-between p-3 rounded-lg border transition-all
             ${store.soundEnabled ? 'border-blue-500/50 bg-blue-500/10' : 'border-gray-700 bg-gray-800/50 hover:bg-gray-700'}`}

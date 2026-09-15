@@ -4,6 +4,7 @@ import { LessonsPanel } from './components/LessonsPanel';
 import { TopNavigation } from './components/TopNavigation';
 import { OnboardingModal } from './components/OnboardingModal';
 import { MetricsPanel } from './components/MetricsPanel';
+import { SettingsModal } from './components/SettingsModal';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
       
       <TopNavigation />
       <OnboardingModal />
+      <SettingsModal />
 
       {/* Main Content */}
       <main className="flex-1 flex p-6 gap-6 items-center justify-center relative z-10 w-full max-w-[1400px] mx-auto">

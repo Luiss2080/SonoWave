@@ -10,6 +10,9 @@ interface SimulationState {
   viewMode: 'ondas' | 'particulas' | 'ambos';
   soundEnabled: boolean;
   metricsVisible: boolean;
+  isPaused: boolean;
+  sourceVelocity: number; // Para Doppler
+  waveColor: string;
   setFrequency: (f: number) => void;
   setAmplitude: (a: number) => void;
   setMode: (m: 'continuo' | 'pulso') => void;
@@ -21,6 +24,9 @@ interface SimulationState {
   setHelpModalOpen: (isOpen: boolean) => void;
   setWaveShape: (shape: 'sine' | 'square' | 'triangle') => void;
   setMedium: (medium: 'aire' | 'agua' | 'acero') => void;
+  setPaused: (p: boolean) => void;
+  setSourceVelocity: (v: number) => void;
+  setWaveColor: (c: string) => void;
   reset: () => void;
 }
 
@@ -35,6 +41,9 @@ const initialState = {
   soundEnabled: true,
   metricsVisible: true,
   isHelpModalOpen: true, // Abrir onboarding por defecto
+  isPaused: false,
+  sourceVelocity: 0,
+  waveColor: 'cyan',
 };
 
 export const useStore = create<SimulationState>((set) => ({
@@ -49,5 +58,8 @@ export const useStore = create<SimulationState>((set) => ({
   setHelpModalOpen: (isOpen) => set({ isHelpModalOpen: isOpen }),
   setWaveShape: (shape) => set({ waveShape: shape }),
   setMedium: (medium) => set({ medium }),
+  setPaused: (p) => set({ isPaused: p }),
+  setSourceVelocity: (v) => set({ sourceVelocity: v }),
+  setWaveColor: (c) => set({ waveColor: c }),
   reset: () => set(initialState),
 }));

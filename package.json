@@ -20,8 +20,10 @@
   },
   "dependencies": {
     "clsx": "^2.1.1",
+    "framer-motion": "^13.3.0",
     "gsap": "^3.15.0",
     "lucide-react": "^1.46.0",
+    "pixi-filters": "^6.1.5",
     "pixi.js": "^8.20.1",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",

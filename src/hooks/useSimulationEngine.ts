@@ -51,7 +51,7 @@ export function useSimulationEngine(canvasRef: React.RefObject<HTMLDivElement>) 
     else if (store.medium === 'agua') modelo.setVelocidad(600);
     else if (store.medium === 'acero') modelo.setVelocidad(1200);
 
-    if (store.soundEnabled && store.amplitude > 0) {
+    if (store.soundEnabled && store.amplitude > 0 && !store.isPaused) {
       audio.iniciarTono(store.frequency * 100, store.waveShape);
       audio.setFrecuencia(store.frequency * 100);
       audio.setVolumen(store.amplitude / 100);
@@ -59,7 +59,7 @@ export function useSimulationEngine(canvasRef: React.RefObject<HTMLDivElement>) 
     } else {
       audio.detenerTono();
     }
-  }, [store.frequency, store.amplitude, store.mode, store.soundEnabled, store.waveShape, store.medium]);
+  }, [store.frequency, store.amplitude, store.mode, store.soundEnabled, store.waveShape, store.medium, store.isPaused]);
 
   return {
     modeloOnda: modeloOndaRef.current,

@@ -27,6 +27,8 @@ interface SimulationState {
   setHelpModalOpen: (isOpen: boolean) => void;
   setWaveShape: (shape: 'sine' | 'square' | 'triangle') => void;
   setMedium: (medium: 'aire' | 'agua' | 'acero') => void;
+  setPaused: (p: boolean) => void;
+  setSourceVelocity: (v: number) => void;
   setWaveColor: (c: string) => void;
   setSettingsOpen: (isOpen: boolean) => void;
   setInterferenceMode: (isActive: boolean) => void;
@@ -65,6 +67,7 @@ export const useStore = create<SimulationState>((set) => ({
   setHelpModalOpen: (isOpen) => set({ isHelpModalOpen: isOpen }),
   setWaveShape: (shape) => set({ waveShape: shape }),
   setMedium: (medium) => set({ medium }),
+  setPaused: (p) => set({ isPaused: p }),
   setSourceVelocity: (v) => set({ sourceVelocity: v }),
   setWaveColor: (c) => set({ waveColor: c }),
   setSettingsOpen: (isOpen) => set({ isSettingsOpen: isOpen }),

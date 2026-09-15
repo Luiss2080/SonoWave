@@ -1,6 +1,7 @@
-import React from 'react';
 import { BookOpen, CheckCircle, Lock, Trophy } from 'lucide-react';
 import { useStore } from '../store/useStore';
+import { motion } from 'framer-motion';
+import { Tooltip } from './Tooltip';
 
 const LESSONS = [
   { id: 1, title: "Fundamentos de la Onda", desc: "Aprende qué es la frecuencia", locked: false, completed: true },
@@ -21,9 +22,11 @@ export const LessonsPanel: React.FC = () => {
 
       <div className="flex flex-col gap-3">
         {LESSONS.map((lesson) => (
-          <div 
+          <motion.div 
+            whileHover={{ scale: 1.02, rotateX: 2, rotateY: -2, zIndex: 10 }}
+            whileTap={{ scale: 0.98 }}
             key={lesson.id}
-            className={`p-4 rounded-xl border transition-all ${
+            className={`p-4 rounded-xl border transition-colors shadow-lg ${
               lesson.locked ? 'bg-gray-900/50 border-gray-800 opacity-60' : 
               lesson.completed ? 'bg-green-500/10 border-green-500/30 cursor-pointer hover:bg-green-500/20' : 
               'bg-blue-500/10 border-blue-500/30 cursor-pointer hover:bg-blue-500/20'
@@ -33,7 +36,11 @@ export const LessonsPanel: React.FC = () => {
               <div>
                 <h3 className="font-semibold text-sm text-white mb-1 flex items-center gap-2">
                   {lesson.title}
-                  {lesson.locked && <Lock size={12} className="text-gray-500" />}
+                  {lesson.locked && (
+                    <Tooltip content="Requiere suscripción Pro">
+                      <Lock size={12} className="text-gray-500" />
+                    </Tooltip>
+                  )}
                 </h3>
                 <p className="text-xs text-gray-400">{lesson.desc}</p>
               </div>
@@ -56,7 +63,7 @@ export const LessonsPanel: React.FC = () => {
                 </button>
               </div>
             )}
-          </div>
+          </motion.div>
         ))}
       </div>
 

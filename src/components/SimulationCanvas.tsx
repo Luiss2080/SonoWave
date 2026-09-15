@@ -1,7 +1,7 @@
-import React, { useRef, useEffect } from 'react';
 import { useSimulationEngine } from '../hooks/useSimulationEngine';
 import { useStore } from '../store/useStore';
 import * as PIXI from 'pixi.js';
+import { AdvancedBloomFilter } from 'pixi-filters';
 
 export const SimulationCanvas: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -13,6 +13,16 @@ export const SimulationCanvas: React.FC = () => {
 
     // Setup Render Layers
     const capaOndas = new PIXI.Graphics();
+    
+    // Aplicar filtro de Bloom para el efecto neón
+    const bloomFilter = new AdvancedBloomFilter({
+      threshold: 0.1,
+      bloomScale: 1.5,
+      brightness: 1.2,
+      blur: 4
+    });
+    capaOndas.filters = [bloomFilter];
+    
     app.stage.addChild(capaOndas);
 
     const contenedorParticulas = new PIXI.ParticleContainer(3000, { position: true });

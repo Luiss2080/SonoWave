@@ -11,12 +11,12 @@ export class GestorAudio {
       this.nodoGanancia.gain.value = 0.1;
   }
 
-  iniciarTono(frecuencia: number) {
+  iniciarTono(frecuencia: number, tipo: OscillatorType = 'sine') {
       if (!this.contextoAudio) this.inicializar();
       if (this.estaReproduciendo) return;
       
       this.oscilador = this.contextoAudio!.createOscillator();
-      this.oscilador.type = 'sine';
+      this.oscilador.type = tipo;
       this.oscilador.frequency.value = frecuencia;
       
       this.oscilador.connect(this.nodoGanancia!);
@@ -34,6 +34,12 @@ export class GestorAudio {
   setFrecuencia(frecuencia: number) {
       if (this.oscilador && this.contextoAudio) {
           this.oscilador.frequency.setTargetAtTime(frecuencia, this.contextoAudio.currentTime, 0.01);
+      }
+  }
+
+  setTipoOnda(tipo: OscillatorType) {
+      if (this.oscilador) {
+          this.oscilador.type = tipo;
       }
   }
 

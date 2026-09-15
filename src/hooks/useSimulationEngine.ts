@@ -48,14 +48,14 @@ export function useSimulationEngine(canvasRef: React.RefObject<HTMLDivElement>) 
     modelo.setModo(store.mode);
 
     if (store.soundEnabled && store.amplitude > 0) {
-      // Mapear frecuencia de 1-5 Hz a un tono audible (ej. 100 - 500 Hz para oírlo bien)
-      audio.iniciarTono(store.frequency * 100);
+      audio.iniciarTono(store.frequency * 100, store.waveShape);
       audio.setFrecuencia(store.frequency * 100);
       audio.setVolumen(store.amplitude / 100);
+      audio.setTipoOnda(store.waveShape);
     } else {
       audio.detenerTono();
     }
-  }, [store.frequency, store.amplitude, store.mode, store.soundEnabled]);
+  }, [store.frequency, store.amplitude, store.mode, store.soundEnabled, store.waveShape]);
 
   return {
     modeloOnda: modeloOndaRef.current,

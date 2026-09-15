@@ -6,8 +6,18 @@ export const TopNavigation: React.FC = () => {
   const { setHelpModalOpen } = useStore();
 
   const handleSave = () => {
-    // Simular un guardado de snapshot
-    alert("Snapshot guardado temporalmente en memoria (Pro Feature).");
+    const canvas = document.querySelector('canvas');
+    if (canvas) {
+      const url = canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'simulador-ondas-snapshot.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } else {
+      alert("Error: No se encontró el canvas de simulación.");
+    }
   };
 
   return (

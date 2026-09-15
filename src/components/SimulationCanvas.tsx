@@ -17,19 +17,7 @@ export const SimulationCanvas: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!containerRef.current) return;
-
-    // Initialize PixiJS App con preserveDrawingBuffer para permitir descargar la imagen
-    const app = new PIXI.Application({
-      width: 800,
-      height: 400,
-      backgroundColor: 0x030712, // bg-gray-950
-      resolution: window.devicePixelRatio || 1,
-      autoDensity: true,
-      preserveDrawingBuffer: true 
-    });
-
-    containerRef.current.appendChild(app.view as HTMLCanvasElement);
+    if (!app) return;
 
     // Setup Render Layers
     const capaOndas = new PIXI.Graphics();

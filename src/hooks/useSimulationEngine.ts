@@ -24,6 +24,7 @@ export function useSimulationEngine(canvasRef: React.RefObject<HTMLDivElement>) 
       backgroundColor: 0x030712,
       resolution: window.devicePixelRatio || 1,
       autoDensity: true,
+      preserveDrawingBuffer: true,
     });
 
     canvasRef.current.appendChild(app.view as any);
@@ -59,7 +60,12 @@ export function useSimulationEngine(canvasRef: React.RefObject<HTMLDivElement>) 
     } else {
       audio.detenerTono();
     }
-  }, [store.frequency, store.amplitude, store.mode, store.soundEnabled, store.waveShape, store.medium, store.isPaused]);
+    
+    // Configuraciones avanzadas
+    modelo.modoInterferencia = store.isInterferenceMode;
+    modelo.factorAmortiguacion = store.dampingFactor;
+
+  }, [store.frequency, store.amplitude, store.mode, store.soundEnabled, store.waveShape, store.medium, store.isPaused, store.isInterferenceMode, store.dampingFactor]);
 
   return {
     modeloOnda: modeloOndaRef.current,

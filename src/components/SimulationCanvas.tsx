@@ -17,7 +17,19 @@ export const SimulationCanvas: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!app) return;
+    if (!containerRef.current) return;
+
+    // Initialize PixiJS App con preserveDrawingBuffer para permitir descargar la imagen
+    const app = new PIXI.Application({
+      width: 800,
+      height: 400,
+      backgroundColor: 0x030712, // bg-gray-950
+      resolution: window.devicePixelRatio || 1,
+      autoDensity: true,
+      preserveDrawingBuffer: true 
+    });
+
+    containerRef.current.appendChild(app.view as HTMLCanvasElement);
 
     // Setup Render Layers
     const capaOndas = new PIXI.Graphics();
@@ -112,6 +124,12 @@ export const SimulationCanvas: React.FC = () => {
 
           capaOndas.lineStyle(8, colorFinal, 0.6);
           capaOndas.drawCircle(0, 200, r);
+
+          if (store.isInterferenceMode) {
+             // Dibujar segunda onda offseteada
+             capaOndas.lineStyle(8, colorFinal, 0.4);
+             capaOndas.drawCircle(0, 100, r); 
+          }
         }
 
         // Ondas Interactivas (Clics)

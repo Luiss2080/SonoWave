@@ -32,8 +32,7 @@ describe('Componente Controls', () => {
 
   it('debería alternar el sonido', () => {
     render(<Controls />);
-    // El texto está dentro de un span
-    const botonSonido = screen.getByText(/Sonido/); 
+    const botonSonido = screen.getByText(/Audio/); 
     
     fireEvent.click(botonSonido);
     expect(useStore.getState().soundEnabled).toBe(false);

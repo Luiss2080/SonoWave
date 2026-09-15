@@ -1,3 +1,4 @@
+import React, { useRef, useEffect } from 'react';
 import { useSimulationEngine } from '../hooks/useSimulationEngine';
 import { useStore } from '../store/useStore';
 import * as PIXI from 'pixi.js';

@@ -3,22 +3,26 @@ import { render, screen } from '@testing-library/react';
 import App from './App';
 
 // Mock Web Audio API
-(window as any).AudioContext = vi.fn().mockImplementation(() => ({
-  createOscillator: () => ({
-    type: 'sine',
-    frequency: { value: 0, setTargetAtTime: vi.fn() },
-    connect: vi.fn(),
-    start: vi.fn(),
-    stop: vi.fn(),
-    disconnect: vi.fn()
-  }),
-  createGain: () => ({
-    gain: { value: 0, setTargetAtTime: vi.fn() },
-    connect: vi.fn()
-  }),
-  destination: {},
-  currentTime: 0
-}));
+(window as any).AudioContext = class {
+  createOscillator() {
+    return {
+      type: 'sine',
+      frequency: { value: 0, setTargetAtTime: vi.fn() },
+      connect: vi.fn(),
+      start: vi.fn(),
+      stop: vi.fn(),
+      disconnect: vi.fn()
+    };
+  }
+  createGain() {
+    return {
+      gain: { value: 0, setTargetAtTime: vi.fn() },
+      connect: vi.fn()
+    };
+  }
+  destination = {};
+  currentTime = 0;
+};
 
 // Mock PixiJS Canvas Context
 HTMLCanvasElement.prototype.getContext = vi.fn(() => ({

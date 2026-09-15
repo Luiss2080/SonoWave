@@ -11,8 +11,11 @@ interface SimulationState {
   soundEnabled: boolean;
   metricsVisible: boolean;
   isPaused: boolean;
-  sourceVelocity: number; // Para Doppler
+  sourceVelocity: number; 
   waveColor: string;
+  isSettingsOpen: boolean;
+  isInterferenceMode: boolean;
+  dampingFactor: number;
   setFrequency: (f: number) => void;
   setAmplitude: (a: number) => void;
   setMode: (m: 'continuo' | 'pulso') => void;
@@ -24,9 +27,10 @@ interface SimulationState {
   setHelpModalOpen: (isOpen: boolean) => void;
   setWaveShape: (shape: 'sine' | 'square' | 'triangle') => void;
   setMedium: (medium: 'aire' | 'agua' | 'acero') => void;
-  setPaused: (p: boolean) => void;
-  setSourceVelocity: (v: number) => void;
   setWaveColor: (c: string) => void;
+  setSettingsOpen: (isOpen: boolean) => void;
+  setInterferenceMode: (isActive: boolean) => void;
+  setDampingFactor: (d: number) => void;
   reset: () => void;
 }
 
@@ -40,10 +44,13 @@ const initialState = {
   viewMode: 'ambos' as const,
   soundEnabled: true,
   metricsVisible: true,
-  isHelpModalOpen: true, // Abrir onboarding por defecto
+  isHelpModalOpen: true, 
   isPaused: false,
   sourceVelocity: 0,
   waveColor: 'cyan',
+  isSettingsOpen: false,
+  isInterferenceMode: false,
+  dampingFactor: 0.99,
 };
 
 export const useStore = create<SimulationState>((set) => ({
@@ -58,8 +65,10 @@ export const useStore = create<SimulationState>((set) => ({
   setHelpModalOpen: (isOpen) => set({ isHelpModalOpen: isOpen }),
   setWaveShape: (shape) => set({ waveShape: shape }),
   setMedium: (medium) => set({ medium }),
-  setPaused: (p) => set({ isPaused: p }),
   setSourceVelocity: (v) => set({ sourceVelocity: v }),
   setWaveColor: (c) => set({ waveColor: c }),
+  setSettingsOpen: (isOpen) => set({ isSettingsOpen: isOpen }),
+  setInterferenceMode: (isActive) => set({ isInterferenceMode: isActive }),
+  setDampingFactor: (d) => set({ dampingFactor: d }),
   reset: () => set(initialState),
 }));

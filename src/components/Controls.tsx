@@ -1,6 +1,6 @@
-import React from 'react';
 import { useStore } from '../store/useStore';
-import { Settings2, Volume2, VolumeX, Activity, Eye, RefreshCcw, PlayCircle, PauseCircle } from 'lucide-react';
+import { Settings2, Volume2, VolumeX, Activity, Eye, RefreshCcw, PlayCircle, PauseCircle, Wind } from 'lucide-react';
+import { Tooltip } from './Tooltip';
 
 export const Controls: React.FC = () => {
   const store = useStore();
@@ -91,6 +91,42 @@ export const Controls: React.FC = () => {
             onChange={(e) => store.setAmplitude(parseInt(e.target.value))}
             className="w-full accent-blue-500 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
           />
+        </div>
+      </div>
+
+      {/* Medio de Propagación */}
+      <div className="flex flex-col gap-3">
+        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+          <Wind size={16} /> Medio Físico
+        </h3>
+        <div className="flex bg-gray-900/50 rounded-lg p-1">
+          <Tooltip content="Sonido viaja a ~343 m/s">
+            <button 
+              className={`flex-1 w-full py-1.5 rounded-md transition-all text-xs font-medium 
+                ${store.medium === 'aire' ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white'}`}
+              onClick={() => store.setMedium('aire')}
+            >
+              Aire
+            </button>
+          </Tooltip>
+          <Tooltip content="Sonido viaja a ~1480 m/s">
+            <button 
+              className={`flex-1 w-full py-1.5 rounded-md transition-all text-xs font-medium 
+                ${store.medium === 'agua' ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white'}`}
+              onClick={() => store.setMedium('agua')}
+            >
+              Agua
+            </button>
+          </Tooltip>
+          <Tooltip content="Sonido viaja a ~5000 m/s">
+            <button 
+              className={`flex-1 w-full py-1.5 rounded-md transition-all text-xs font-medium 
+                ${store.medium === 'acero' ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white'}`}
+              onClick={() => store.setMedium('acero')}
+            >
+              Acero
+            </button>
+          </Tooltip>
         </div>
       </div>
 

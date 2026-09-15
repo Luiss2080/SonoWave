@@ -7,11 +7,20 @@ interface Emision {
 export class ModeloOnda {
   public amplitud: number = 50;
   public frecuencia: number = 2;
-  public velocidad: number = 200;
+  public velocidad: number = 200; // Velocidad base
   public tiempo: number = 0;
   public modo: 'continuo' | 'pulso' = 'continuo';
   public tiempoInicioPulso: number = 0;
   private historialEmisiones: Emision[] = [];
+  public ondasExtra: { x: number, y: number, tiempoInicio: number }[] = [];
+
+  setVelocidad(v: number) {
+      this.velocidad = v;
+  }
+
+  agregarOndaExtra(x: number, y: number) {
+      this.ondasExtra.push({ x, y, tiempoInicio: this.tiempo });
+  }
 
   actualizar(tiempoDelta: number, factorVelocidad: number = 1) {
       this.tiempo += tiempoDelta * factorVelocidad;
@@ -37,10 +46,14 @@ export class ModeloOnda {
           desplazamiento: desplazamientoEmitido
       });
 
+      // Limpiar historial viejo
       const tiempoLimite = this.tiempo - 5;
       while (this.historialEmisiones.length > 0 && this.historialEmisiones[0].tiempo < tiempoLimite) {
           this.historialEmisiones.shift();
       }
+
+      // Limpiar ondas extra viejas (duración de 3 segundos)
+      this.ondasExtra = this.ondasExtra.filter(o => this.tiempo - o.tiempoInicio < 3);
   }
 
   setFrecuencia(f: number) {

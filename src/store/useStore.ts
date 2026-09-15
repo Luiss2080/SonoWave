@@ -5,6 +5,7 @@ interface SimulationState {
   amplitude: number;
   mode: 'continuo' | 'pulso';
   waveShape: 'sine' | 'square' | 'triangle';
+  medium: 'aire' | 'agua' | 'acero';
   timeScale: 'normal' | 'lento';
   viewMode: 'ondas' | 'particulas' | 'ambos';
   soundEnabled: boolean;
@@ -19,6 +20,7 @@ interface SimulationState {
   isHelpModalOpen: boolean;
   setHelpModalOpen: (isOpen: boolean) => void;
   setWaveShape: (shape: 'sine' | 'square' | 'triangle') => void;
+  setMedium: (medium: 'aire' | 'agua' | 'acero') => void;
   reset: () => void;
 }
 
@@ -27,6 +29,7 @@ const initialState = {
   amplitude: 50,
   mode: 'continuo' as const,
   waveShape: 'sine' as const,
+  medium: 'aire' as const,
   timeScale: 'normal' as const,
   viewMode: 'ambos' as const,
   soundEnabled: true,
@@ -45,5 +48,6 @@ export const useStore = create<SimulationState>((set) => ({
   setMetricsVisible: (m) => set({ metricsVisible: m }),
   setHelpModalOpen: (isOpen) => set({ isHelpModalOpen: isOpen }),
   setWaveShape: (shape) => set({ waveShape: shape }),
+  setMedium: (medium) => set({ medium }),
   reset: () => set(initialState),
 }));

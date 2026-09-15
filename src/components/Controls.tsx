@@ -33,6 +33,34 @@ export const Controls: React.FC = () => {
         </div>
       </div>
 
+      {/* Tipo de Onda (Audio) */}
+      <div className="flex flex-col gap-3">
+        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Tipo de Onda</h3>
+        <div className="flex bg-gray-900/50 rounded-lg p-1">
+          <button 
+            className={`flex-1 py-1.5 rounded-md transition-all text-xs font-medium 
+              ${store.waveShape === 'sine' ? 'bg-purple-600 text-white' : 'text-gray-400 hover:text-white'}`}
+            onClick={() => store.setWaveShape('sine')}
+          >
+            Senoidal
+          </button>
+          <button 
+            className={`flex-1 py-1.5 rounded-md transition-all text-xs font-medium 
+              ${store.waveShape === 'square' ? 'bg-purple-600 text-white' : 'text-gray-400 hover:text-white'}`}
+            onClick={() => store.setWaveShape('square')}
+          >
+            Cuadrada
+          </button>
+          <button 
+            className={`flex-1 py-1.5 rounded-md transition-all text-xs font-medium 
+              ${store.waveShape === 'triangle' ? 'bg-purple-600 text-white' : 'text-gray-400 hover:text-white'}`}
+            onClick={() => store.setWaveShape('triangle')}
+          >
+            Triangular
+          </button>
+        </div>
+      </div>
+
       {/* Parámetros Físicos */}
       <div className="flex flex-col gap-4">
         <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Parámetros Físicos</h3>

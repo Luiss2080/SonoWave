@@ -159,6 +159,34 @@ export const Controls: React.FC = () => {
         </div>
       </div>
 
+      {/* Color de Onda */}
+      <div className="flex flex-col gap-3">
+        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Color Base</h3>
+        <div className="flex bg-gray-900/50 rounded-lg p-1">
+          <button 
+            className={`flex-1 py-1.5 rounded-md transition-all text-xs font-medium 
+              ${store.waveColor === 'cyan' ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white'}`}
+            onClick={() => store.setWaveColor('cyan')}
+          >
+            Cyan
+          </button>
+          <button 
+            className={`flex-1 py-1.5 rounded-md transition-all text-xs font-medium 
+              ${store.waveColor === 'magenta' ? 'bg-pink-600 text-white' : 'text-gray-400 hover:text-white'}`}
+            onClick={() => store.setWaveColor('magenta')}
+          >
+            Magenta
+          </button>
+          <button 
+            className={`flex-1 py-1.5 rounded-md transition-all text-xs font-medium 
+              ${store.waveColor === 'green' ? 'bg-green-600 text-white' : 'text-gray-400 hover:text-white'}`}
+            onClick={() => store.setWaveColor('green')}
+          >
+            Neón
+          </button>
+        </div>
+      </div>
+
       {/* Toggles Rápidos */}
       <div className="flex flex-col gap-3 mt-auto">
         <button 

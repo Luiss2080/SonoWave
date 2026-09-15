@@ -3,6 +3,7 @@ import { Controls } from './components/Controls';
 import { LessonsPanel } from './components/LessonsPanel';
 import { TopNavigation } from './components/TopNavigation';
 import { OnboardingModal } from './components/OnboardingModal';
+import { MetricsPanel } from './components/MetricsPanel';
 
 function App() {
   return (
@@ -16,7 +17,8 @@ function App() {
         
         <LessonsPanel />
 
-        <div className="flex flex-col gap-4 flex-1 items-center">
+        <div className="flex flex-col gap-4 flex-1 items-center relative">
+          <MetricsPanel />
           <div className="flex items-center justify-between px-4 w-full max-w-[800px]">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>

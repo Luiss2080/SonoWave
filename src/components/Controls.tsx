@@ -1,5 +1,5 @@
 import { useStore } from '../store/useStore';
-import { Settings2, Volume2, VolumeX, Activity, Eye, RefreshCcw, PlayCircle, PauseCircle, Wind } from 'lucide-react';
+import { Settings2, Volume2, VolumeX, Activity, Eye, RefreshCcw, PlayCircle, Wind } from 'lucide-react';
 import { Tooltip } from './Tooltip';
 
 export const Controls: React.FC = () => {

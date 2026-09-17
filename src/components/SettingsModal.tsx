@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal } from './Modal';
 import { useStore } from '../store/useStore';
-import { Sliders, Volume2, Wind } from 'lucide-react';
+import { Sliders, Wind } from 'lucide-react';
 
 export const SettingsModal: React.FC = () => {
   const { isSettingsOpen, setSettingsOpen, isInterferenceMode, setInterferenceMode, dampingFactor, setDampingFactor } = useStore();

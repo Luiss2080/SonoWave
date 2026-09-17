@@ -1,6 +1,6 @@
 <div align="center">
   
-# 🌊 Simulador de Ondas Pro (Edición Definitiva)
+# 🌊 SonoWave (antes Simulador de Ondas Pro)
 
 [![React](https://img.shields.io/badge/React-18-blue.svg?style=for-the-badge&logo=react)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue.svg?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
@@ -18,7 +18,7 @@
 
 ## 📖 Introducción
 
-El **Simulador de Ondas Pro** es un laboratorio virtual avanzado construido bajo el estándar *Spec-Driven Development*. Permite a estudiantes, profesores y curiosos visualizar la propagación de ondas sonoras en tiempo real, interactuar con el medio físico, escuchar las frecuencias exactas a través de osciladores web y estudiar patrones complejos como la interferencia o el efecto Doppler. Todo ello envuelto en una deslumbrante interfaz *Glassmorphism* y renderizado acelerado por hardware (WebGL).
+**SonoWave** es un laboratorio virtual avanzado construido bajo el estándar *Spec-Driven Development*. Permite a estudiantes, profesores y curiosos visualizar la propagación de ondas sonoras en tiempo real, interactuar con el medio físico, escuchar las frecuencias exactas a través de osciladores web y estudiar patrones complejos como la interferencia o el efecto Doppler. Todo ello envuelto en una deslumbrante interfaz *Glassmorphism* y renderizado acelerado por hardware (WebGL).
 
 ---
 
@@ -48,10 +48,10 @@ Asegúrate de tener [Node.js](https://nodejs.org/) instalado en tu sistema (v16+
 
 ```bash
 # 1. Clona el repositorio
-git clone https://github.com/tu-usuario/simulador-de-ondas.git
+git clone https://github.com/tu-usuario/sonowave.git
 
 # 2. Entra al directorio
-cd simulador-de-ondas
+cd sonowave
 
 # 3. Instala las dependencias
 npm install

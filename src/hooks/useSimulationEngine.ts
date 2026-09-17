@@ -5,12 +5,11 @@ import { GestorAudio } from '../engine/audio/GestorAudio';
 import { useStore } from '../store/useStore';
 import * as PIXI from 'pixi.js';
 
-export function useSimulationEngine(canvasRef: React.RefObject<HTMLDivElement>) {
+export function useSimulationEngine(canvasRef: React.RefObject<HTMLDivElement | null>) {
   const modeloOndaRef = useRef(new ModeloOnda());
   const sistemaParticulasRef = useRef(new SistemaParticulas(modeloOndaRef.current, 800, 400, 15));
   const gestorAudioRef = useRef(new GestorAudio());
   const appRef = useRef<PIXI.Application | null>(null);
-  const engineRef = useRef<any>(null); // To store Pixi app rendering loop
 
   const store = useStore();
 

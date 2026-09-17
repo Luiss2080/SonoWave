@@ -34,7 +34,7 @@ export const SimulationCanvas: React.FC = () => {
     
     app.stage.addChild(capaOndas);
 
-    const contenedorParticulas = new PIXI.ParticleContainer(3000, { position: true });
+    const contenedorParticulas = new PIXI.ParticleContainer({ dynamicProperties: { position: true } });
     app.stage.addChild(contenedorParticulas);
 
     const spritesParticulas: PIXI.Sprite[] = [];
@@ -65,23 +65,14 @@ export const SimulationCanvas: React.FC = () => {
     });
 
     // Update loop
-    const ticker = (delta: number) => {
-      const timeDelta = (delta / 60) * (store.timeScale === 'lento' ? 0.2 : 1);
-      modeloOnda.actualizar(timeDelta);
+    const ticker = (t: PIXI.Ticker) => {
       if (store.isPaused) return;
 
-      const tiempoDelta = app.ticker.deltaMS / 1000;
+      const tiempoDelta = t.deltaMS / 1000;
       const factorVelocidad = store.timeScale === 'lento' ? 0.2 : 1.0;
-      
-      // Simular Doppler moviendo la fuente principal
-      if (store.sourceVelocity !== 0) {
-        // En este prototipo simple de Doppler, movemos el origen virtual
-        // hacia la derecha. (Para ser físicamente preciso requiere más matemáticas, pero visualmente cumple)
-        // Guardaremos el desplazamiento X de la fuente en el store (solo para pintar)
-      }
 
       modeloOnda.actualizar(tiempoDelta, factorVelocidad);
-      sistemaParticulas.actualizar(modeloOnda);
+      sistemaParticulas.actualizar();
 
       // Render Particles
       if (store.viewMode === 'particulas' || store.viewMode === 'ambos') {
@@ -100,16 +91,15 @@ export const SimulationCanvas: React.FC = () => {
         // Onda Principal
         for (let r = 0; r < 900; r += 8) {
           const presion = modeloOnda.getPresionEn(r);
-          const factor = (presion + 100) / 200;
-          const valorGris = Math.floor(Math.max(0, Math.min(1, factor)) * 255);
-          
+          const factor = Math.max(0, Math.min(1, (presion + 100) / 200));
+
           let color = 0x0ea5e9; // default cyan
           if (store.waveColor === 'magenta') color = 0xd946ef;
           else if (store.waveColor === 'green') color = 0x22c55e;
-          
-          // Mezclar el color base con la intensidad de gris
-          const rgb = PIXI.utils.hex2rgb(color);
-          const colorFinal = PIXI.utils.rgb2hex([rgb[0] * factor, rgb[1] * factor, rgb[2] * factor]);
+
+          // Mezclar el color base con la intensidad de la presión
+          const [r255, g255, b255] = new PIXI.Color(color).toUint8RgbArray();
+          const colorFinal = new PIXI.Color([r255 * factor / 255, g255 * factor / 255, b255 * factor / 255]).toNumber();
 
           capaOndas.lineStyle(8, colorFinal, 0.6);
           capaOndas.drawCircle(0, 200, r);

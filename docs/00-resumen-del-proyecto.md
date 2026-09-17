@@ -1,4 +1,4 @@
-# 00. Resumen del Proyecto: Simulador de Ondas Sonoras
+# 00. Resumen del Proyecto: SonoWave (antes "Simulador de Ondas Sonoras")
 
 ## Introducción
 Este proyecto consiste en el diseño y documentación de un simulador interactivo de ondas sonoras en el navegador, inspirado en el módulo "Ondas: Intro" de PhET. El objetivo es proporcionar una herramienta educativa visual y auditiva de alto rendimiento (60 FPS) que permita comprender el comportamiento de las ondas mecánicas longitudinales (sonido) a través de la manipulación de variables físicas como la frecuencia y la amplitud.

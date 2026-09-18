@@ -18,7 +18,7 @@
   </p>
 </div>
 
-**SonoWave** (antes "Simulador de Ondas Pro") es un simulador didáctico en React que dibuja frentes de onda circulares desde una fuente, con una malla de partículas que se desplaza al paso de la onda, y genera un tono con un `OscillatorNode` de Web Audio. El motor físico está escrito con clases TypeScript propias. **Estado real:** con las dependencias actuales (PixiJS 8.20.1) la aplicación **falla al montar el canvas y la página queda en blanco**; el motor y el estado sí tienen pruebas que pasan. Detalles en [Lo que todavía no existe](#-lo-que-todavía-no-existe).
+**SonoWave** (antes "Simulador de Ondas Pro") es un simulador didáctico en React que dibuja frentes de onda circulares desde una fuente, con una malla de partículas que se desplaza al paso de la onda, y genera un tono con un `OscillatorNode` de Web Audio. El motor físico está escrito con clases TypeScript propias. **Estado real:** funciona con PixiJS 8.20.1 (verificado en Chrome headless: monta el canvas WebGL y la interfaz sin errores de consola); el renderizado real sigue sin pruebas automáticas. Detalles en [Lo que todavía no existe](#-lo-que-todavía-no-existe).
 
 ## 🎬 Vista rápida
 
@@ -97,7 +97,7 @@ cd SonoWave
 npm ci
 npm run dev       # Vite; abre la URL que imprime (normalmente http://localhost:5173)
 npm test          # Vitest, una pasada
-npm run build     # tsc + vite build (hoy falla, ver Pruebas)
+npm run build     # tsc + vite build
 ```
 
 `index.html` carga la fuente *Outfit* desde Google Fonts y Font Awesome desde un CDN, así que sin internet se ve con fuentes por defecto.
@@ -109,12 +109,11 @@ npm test
 ```
 
 - **23 pruebas en 6 archivos**, todas pasan (Vitest 5 + jsdom + Testing Library): `ModeloOnda`, `SistemaParticulas`, `GestorAudio`, `useStore`, `Controls` y `App`.
-- Cubren el motor y el estado; **no** cubren el renderizado real con PixiJS (jsdom no tiene canvas, por lo que hay avisos de `getContext()` no implementado). Por eso no detectan el fallo de arranque descrito abajo.
-- **`npm run build` falla hoy**: `tsc` reporta `TS6133` en `src/engine/audio/GestorAudio.test.ts` (importa `beforeEach` sin usarlo). La CI (`.github/workflows/ci.yml`: instalar, probar, compilar) fallará en ese paso.
+- Cubren el motor y el estado; **no** cubren el renderizado real con PixiJS (jsdom no tiene canvas, por lo que hay avisos de `getContext()` no implementado). Por eso un fallo de arranque del canvas (como el corregido en PixiJS 8) no lo detectarían; se verificó a mano en Chrome headless.
+- `npm run build` (`tsc` + `vite build`) compila sin errores; la CI instala, prueba y compila.
 
 ## 🚧 Lo que todavía no existe
 
-- **La aplicación no renderiza con las dependencias actuales.** `SimulationCanvas` llama a `ParticleContainer.addChild()`, que PixiJS 8 no permite (exige `addParticle()`), y el error no capturado hace que React desmonte toda la interfaz: `#root` queda vacío (comprobado en Chrome con `npm run dev`). El código también usa `Graphics.lineStyle`/`drawCircle` de la API de Pixi 7; no se verificó su comportamiento en la versión 8.
 - **El README anterior prometía cosas que el código no hace:** velocidades reales del sonido (343, 1480 y 5000 m/s; el código usa 200, 600 y 1200 px/s), efecto Doppler (la lección aparece bloqueada y `sourceVelocity` no se usa en la física), interferencia con dos fuentes reales y un sistema de misiones con progreso.
 - **Pausa y cámara lenta:** el store y el canvas los soportan (`isPaused`, `timeScale`), pero ningún control de la interfaz los activa.
 - **Misiones:** el panel muestra 4 tarjetas estáticas; una aparece "completada" por dato fijo y dos están bloqueadas. No hay lógica de progreso.

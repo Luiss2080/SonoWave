@@ -34,34 +34,33 @@ export const SimulationCanvas: React.FC = () => {
     
     app.stage.addChild(capaOndas);
 
+    // En PixiJS 8 un ParticleContainer solo admite objetos Particle (addParticle),
+    // todos con la misma fuente de textura: una sola textura blanca y color por tint.
     const contenedorParticulas = new PIXI.ParticleContainer({ dynamicProperties: { position: true } });
     app.stage.addChild(contenedorParticulas);
 
-    const spritesParticulas: PIXI.Sprite[] = [];
     const particulas = sistemaParticulas.getParticulas();
+    const particulasPixi: PIXI.Particle[] = [];
 
-    // Create Textures
-    const canvasB = document.createElement('canvas');
-    canvasB.width = 12; canvasB.height = 12;
-    const ctxB = canvasB.getContext('2d')!;
-    const gradB = ctxB.createRadialGradient(6,6,1,6,6,5);
-    gradB.addColorStop(0, '#ffffff'); gradB.addColorStop(1, '#64748b');
-    ctxB.fillStyle = gradB; ctxB.beginPath(); ctxB.arc(6,6,5,0,Math.PI*2); ctxB.fill();
-    const texB = PIXI.Texture.from(canvasB);
-
-    const canvasR = document.createElement('canvas');
-    canvasR.width = 12; canvasR.height = 12;
-    const ctxR = canvasR.getContext('2d')!;
-    const gradR = ctxR.createRadialGradient(6,6,1,6,6,5);
-    gradR.addColorStop(0, '#ff8787'); gradR.addColorStop(1, '#b91c1c');
-    ctxR.fillStyle = gradR; ctxR.beginPath(); ctxR.arc(6,6,5,0,Math.PI*2); ctxR.fill();
-    const texR = PIXI.Texture.from(canvasR);
+    const canvasP = document.createElement('canvas');
+    canvasP.width = 12; canvasP.height = 12;
+    const ctxP = canvasP.getContext('2d')!;
+    const gradP = ctxP.createRadialGradient(6, 6, 1, 6, 6, 5);
+    gradP.addColorStop(0, '#ffffff'); gradP.addColorStop(1, '#94a3b8');
+    ctxP.fillStyle = gradP; ctxP.beginPath(); ctxP.arc(6, 6, 5, 0, Math.PI * 2); ctxP.fill();
+    const texturaParticula = PIXI.Texture.from(canvasP);
 
     particulas.forEach(p => {
-      const sprite = new PIXI.Sprite(p.esRoja ? texR : texB);
-      sprite.anchor.set(0.5);
-      contenedorParticulas.addChild(sprite);
-      spritesParticulas.push(sprite);
+      const particula = new PIXI.Particle({
+        texture: texturaParticula,
+        x: p.xActual,
+        y: p.yActual,
+        anchorX: 0.5,
+        anchorY: 0.5,
+        tint: p.esRoja ? 0xef4444 : 0xcbd5e1,
+      });
+      contenedorParticulas.addParticle(particula);
+      particulasPixi.push(particula);
     });
 
     // Update loop
@@ -78,8 +77,8 @@ export const SimulationCanvas: React.FC = () => {
       if (store.viewMode === 'particulas' || store.viewMode === 'ambos') {
         contenedorParticulas.visible = true;
         particulas.forEach((p, i) => {
-          spritesParticulas[i].x = p.xActual;
-          spritesParticulas[i].y = p.yActual;
+          particulasPixi[i].x = p.xActual;
+          particulasPixi[i].y = p.yActual;
         });
       } else {
         contenedorParticulas.visible = false;
@@ -101,13 +100,11 @@ export const SimulationCanvas: React.FC = () => {
           const [r255, g255, b255] = new PIXI.Color(color).toUint8RgbArray();
           const colorFinal = new PIXI.Color([r255 * factor / 255, g255 * factor / 255, b255 * factor / 255]).toNumber();
 
-          capaOndas.lineStyle(8, colorFinal, 0.6);
-          capaOndas.drawCircle(0, 200, r);
+          capaOndas.circle(0, 200, r).stroke({ width: 8, color: colorFinal, alpha: 0.6 });
 
           if (store.isInterferenceMode) {
              // Dibujar segunda onda offseteada
-             capaOndas.lineStyle(8, colorFinal, 0.4);
-             capaOndas.drawCircle(0, 100, r); 
+             capaOndas.circle(0, 100, r).stroke({ width: 8, color: colorFinal, alpha: 0.4 });
           }
         }
 
@@ -117,8 +114,7 @@ export const SimulationCanvas: React.FC = () => {
           const radio = tiempoActivo * modeloOnda.velocidad;
           if (radio > 0 && radio < 1500) {
             // Ancho del pulso simulado
-            capaOndas.lineStyle(10, 0x0ea5e9, Math.max(0, 1 - radio/500)); 
-            capaOndas.drawCircle(onda.x, onda.y, radio);
+            capaOndas.circle(onda.x, onda.y, radio).stroke({ width: 10, color: 0x0ea5e9, alpha: Math.max(0, 1 - radio / 500) });
           }
         });
       }
@@ -128,6 +124,12 @@ export const SimulationCanvas: React.FC = () => {
 
     return () => {
       app.ticker.remove(ticker);
+      // Si el efecto se vuelve a ejecutar (cambia el store) no se acumulan capas.
+      app.stage.removeChild(capaOndas);
+      app.stage.removeChild(contenedorParticulas);
+      capaOndas.destroy();
+      contenedorParticulas.destroy();
+      texturaParticula.destroy(true);
     };
   }, [app, modeloOnda, sistemaParticulas, store.viewMode, store.timeScale, store.isPaused, store.waveColor, store.sourceVelocity]);
 

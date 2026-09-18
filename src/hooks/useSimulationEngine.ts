@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ModeloOnda } from '../engine/physics/ModeloOnda';
 import { SistemaParticulas } from '../engine/physics/SistemaParticulas';
 import { GestorAudio } from '../engine/audio/GestorAudio';
@@ -9,7 +9,9 @@ export function useSimulationEngine(canvasRef: React.RefObject<HTMLDivElement | 
   const modeloOndaRef = useRef(new ModeloOnda());
   const sistemaParticulasRef = useRef(new SistemaParticulas(modeloOndaRef.current, 800, 400, 15));
   const gestorAudioRef = useRef(new GestorAudio());
-  const appRef = useRef<PIXI.Application | null>(null);
+  // Estado (no ref): al terminar init() asíncrono hay que re-renderizar para que
+  // SimulationCanvas reciba la app y monte sus capas.
+  const [app, setApp] = useState<PIXI.Application | null>(null);
 
   const store = useStore();
 
@@ -17,9 +19,12 @@ export function useSimulationEngine(canvasRef: React.RefObject<HTMLDivElement | 
   useEffect(() => {
     if (!canvasRef.current) return;
 
+    let cancelado = false;
+    let appCreada: PIXI.Application | null = null;
+
     const initPixi = async () => {
-      const app = new PIXI.Application();
-      await app.init({
+      const nuevaApp = new PIXI.Application();
+      await nuevaApp.init({
         width: 800,
         height: 400,
         backgroundColor: 0x030712,
@@ -28,20 +33,26 @@ export function useSimulationEngine(canvasRef: React.RefObject<HTMLDivElement | 
         preserveDrawingBuffer: true,
       });
 
-      if (canvasRef.current) {
-        // Compatibilidad con PixiJS v7 y v8
-        const canvasElement = (app as any).canvas || (app as any).view;
-        canvasRef.current.appendChild(canvasElement);
-        appRef.current = app;
+      // El componente pudo desmontarse (p. ej. StrictMode) mientras init() corría.
+      if (cancelado || !canvasRef.current) {
+        nuevaApp.destroy(true, { children: true });
+        return;
       }
+
+      canvasRef.current.appendChild(nuevaApp.canvas);
+      appCreada = nuevaApp;
+      setApp(nuevaApp);
     };
 
     initPixi();
 
     return () => {
-      if (appRef.current) {
-        appRef.current.destroy(true, { children: true });
+      cancelado = true;
+      if (appCreada) {
+        appCreada.destroy(true, { children: true });
+        appCreada = null;
       }
+      setApp(null);
       gestorAudioRef.current.detenerTono();
     };
   }, [canvasRef]);
@@ -77,6 +88,6 @@ export function useSimulationEngine(canvasRef: React.RefObject<HTMLDivElement | 
   return {
     modeloOnda: modeloOndaRef.current,
     sistemaParticulas: sistemaParticulasRef.current,
-    app: appRef.current,
+    app,
   };
 }
